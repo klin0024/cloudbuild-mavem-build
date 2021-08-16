@@ -1,0 +1,32 @@
+---
+steps:
+
+  - name: gcr.io/cloud-builders/git
+    entrypoint: git
+    args: ["clone", "$_GIT_REPO"]
+  
+  - name: maven:3.6-openjdk-8
+    dir: "$_DIR_NAME"
+    entrypoint: mvn
+    args: ["-Dmaven.repo.local=/maven-repo", "clean", "package"]
+
+  - name: gcr.io/cloud-builders/docker
+    dir: "$_DIR_NAME"
+    args: ["build", "-f", "../Dockerfile", "-t", "$_REGISTRY_NAME/$PROJECT_ID/$_REPO_NAME/$_IMAGE_NAME:$_TAG_NAME", "--build-arg=JAR_FILE=target/*.jar", "."]
+
+images: ["$_REGISTRY_NAME/$PROJECT_ID/$_REPO_NAME/$_IMAGE_NAME:$_TAG_NAME"]
+
+options:
+  volumes:
+  - name: 'maven-repo'
+    path: '/maven-repo'
+
+substitutions:
+  _GIT_REPO: https://github.com/spring-projects/spring-petclinic
+  _DIR_NAME: spring-petclinic
+  _REGISTRY_NAME: us-central1-docker.pkg.dev
+  _REPO_NAME: demo
+  _IMAGE_NAME: spring-petclinic
+  _TAG_NAME: v1.0
+
+timeout: 6000s  
