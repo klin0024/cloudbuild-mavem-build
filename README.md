@@ -13,4 +13,6 @@
 
 ### 1. 提交到cloudbuild
 
+```
 $ gcloud builds submit . --substitutions k1=v1,k2=v2
+```
