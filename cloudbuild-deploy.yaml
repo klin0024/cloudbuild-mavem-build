@@ -1,0 +1,49 @@
+---
+steps:
+
+  - name: gcr.io/cloud-builders/git
+    entrypoint: git
+    args: ["clone", "$_GIT_REPO"]
+  
+  - name: maven:3.6-openjdk-8
+    dir: "$_DIR_NAME"
+    entrypoint: mvn
+    args: ["-Dmaven.repo.local=/maven-repo", "clean", "package"]
+
+  - name: gcr.io/cloud-builders/docker
+    args: ["build", "-t", "$_REGISTRY_NAME/$PROJECT_ID/$_REPO_NAME/$_IMAGE_NAME:$_TAG_NAME", "--build-arg=JAR_FILE=target/*.jar", "$_DIR_NAME"]
+
+  - name: gcr.io/cloud-builders/docker
+    args: ["push", "$_REGISTRY_NAME/$PROJECT_ID/$_REPO_NAME/$_IMAGE_NAME:$_TAG_NAME"]  
+
+  - name: gcr.io/cloud-builders/gcloud
+    entrypoint: gcloud
+    args: ["container", "clusters", "get-credentials", "$_CLUSTER_NAME", "--zone", "$_ZONE_NAME", "--project", "$PROJECT_ID"]
+
+  - name: gcr.io/cloud-builders/gcloud
+    entrypoint: kubectl
+    #args: ["apply", "-f", "$_K8S_DIR/*.yml"]
+    args: ["create", "deployment", "$_IMAGE_NAME", "--image=$_REGISTRY_NAME/$PROJECT_ID/$_REPO_NAME/$_IMAGE_NAME:$_TAG_NAME"]
+
+#images: ["$_REGISTRY_NAME/$PROJECT_ID/$_REPO_NAME/$_IMAGE_NAME:$_TAG_NAME"]
+
+options:
+  env:
+  - 'KUBECONFIG=/workspace/kubeconfig'
+  volumes:
+  - name: 'maven-repo'
+    path: '/maven-repo'
+
+substitutions:
+  _GIT_REPO: https://github.com/spring-projects/spring-petclinic
+  _DIR_NAME: spring-petclinic
+  _REGISTRY_NAME: us-central1-docker.pkg.dev
+  _REPO_NAME: demo
+  _IMAGE_NAME: spring-petclinic
+  _TAG_NAME: v1.0
+  _ZONE_NAME: us-central1-c
+  _CLUSTER_NAME: cluster-1
+  #_K8S_DIR: kubernetes
+
+
+timeout: 6000s  
