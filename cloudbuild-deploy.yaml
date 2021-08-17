@@ -11,7 +11,7 @@ steps:
     args: ["-Dmaven.repo.local=/maven-repo", "clean", "package"]
 
   - name: gcr.io/cloud-builders/docker
-    args: ["build", "-t", "$_REGISTRY_NAME/$PROJECT_ID/$_REPO_NAME/$_IMAGE_NAME:$_TAG_NAME", "--build-arg=JAR_FILE=target/*.jar", "$_DIR_NAME"]
+    args: ["build", "-f", "Dockerfile", "-t", "$_REGISTRY_NAME/$PROJECT_ID/$_REPO_NAME/$_IMAGE_NAME:$_TAG_NAME", "--build-arg=JAR_FILE=target/*.jar", "$_DIR_NAME"]
 
   - name: gcr.io/cloud-builders/docker
     args: ["push", "$_REGISTRY_NAME/$PROJECT_ID/$_REPO_NAME/$_IMAGE_NAME:$_TAG_NAME"]  
@@ -41,8 +41,8 @@ substitutions:
   _REPO_NAME: demo
   _IMAGE_NAME: spring-petclinic
   _TAG_NAME: v1.0
+  _CLUSTER_NAME: cluster-1  
   _ZONE_NAME: us-central1-c
-  _CLUSTER_NAME: cluster-1
   #_K8S_DIR: kubernetes
 
 

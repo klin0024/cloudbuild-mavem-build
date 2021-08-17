@@ -11,8 +11,7 @@ steps:
     args: ["-Dmaven.repo.local=/maven-repo", "clean", "package"]
 
   - name: gcr.io/cloud-builders/docker
-    dir: "$_DIR_NAME"
-    args: ["build", "-f", "../Dockerfile", "-t", "$_REGISTRY_NAME/$PROJECT_ID/$_REPO_NAME/$_IMAGE_NAME:$_TAG_NAME", "--build-arg=JAR_FILE=target/*.jar", "."]
+    args: ["build", "-f", "Dockerfile", "-t", "$_REGISTRY_NAME/$PROJECT_ID/$_REPO_NAME/$_IMAGE_NAME:$_TAG_NAME", "--build-arg=JAR_FILE=target/*.jar", "$_DIR_NAME"]
 
 images: ["$_REGISTRY_NAME/$PROJECT_ID/$_REPO_NAME/$_IMAGE_NAME:$_TAG_NAME"]
 

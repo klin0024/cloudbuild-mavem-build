@@ -8,8 +8,8 @@
 \_REPO_NAME| demo | Repo位置
 \_IMAGE_NAME| spring-petclinic | Image名稱
 \_TAG_NAME| v1.0 | Tag名稱
-\_ZONE_NAME| us-central1-c | GKE所在的ZONE
 \_CLUSTER_NAME| cluster-1 | GKE名稱
+\_ZONE_NAME| us-central1-c | GKE所在的ZONE
 \_K8S_DIR| kubernetes | K8S Resource 所在目錄
 
 # 使用說明
@@ -17,5 +17,9 @@
 ### 1. 提交到cloudbuild
 
 ```
-$ gcloud builds submit . --substitutions _TAG_NAME=v2.0
+gcloud builds submit --config=cloudbuild.yaml --substitutions _TAG_NAME=v2.0
+```
+
+```
+gcloud builds submit --config=cloudbuild-deploy.yaml --substitutions _TAG_NAME=v2.0,_CLUSTER_NAME=cluster-1,_ZONE_NAME=us-central1-c
 ```
