@@ -20,10 +20,13 @@ steps:
     entrypoint: gcloud
     args: ["container", "clusters", "get-credentials", "$_CLUSTER_NAME", "--zone", "$_ZONE_NAME", "--project", "$PROJECT_ID"]
 
-  - name: gcr.io/cloud-builders/gcloud
-    entrypoint: kubectl
-    #args: ["apply", "-f", "$_K8S_DIR/*.yml"]
-    args: ["create", "deployment", "$_IMAGE_NAME", "--image=$_REGISTRY_NAME/$PROJECT_ID/$_REPO_NAME/$_IMAGE_NAME:$_TAG_NAME"]
+  #- name: gcr.io/cloud-builders/gcloud
+  #  entrypoint: kubectl
+  #  args: ["create", "deployment", "$_IMAGE_NAME", "--image=$_REGISTRY_NAME/$PROJECT_ID/$_REPO_NAME/$_IMAGE_NAME:$_TAG_NAME"]
+
+  - name: alpine/helm
+    entrypoint: helm
+    args: ["upgrade", "--install", "$_IMAGE_NAME", "$_CHART_DIR", "-n", "$_NAMESPACE_NAME", "--set", "image.repository=$_REGISTRY_NAME/$PROJECT_ID/$_REPO_NAME/$_IMAGE_NAME", "--set", "image.tag=$_TAG_NAME"]
 
 #images: ["$_REGISTRY_NAME/$PROJECT_ID/$_REPO_NAME/$_IMAGE_NAME:$_TAG_NAME"]
 
@@ -43,7 +46,8 @@ substitutions:
   _TAG_NAME: v1.0
   _CLUSTER_NAME: cluster-1  
   _ZONE_NAME: us-central1-c
-  #_K8S_DIR: kubernetes
+  _CHART_DIR: chart
+  _NAMESPACE_NAME: default
 
 
 timeout: 6000s  
