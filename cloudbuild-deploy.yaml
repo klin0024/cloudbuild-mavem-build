@@ -24,9 +24,17 @@ steps:
   #  entrypoint: kubectl
   #  args: ["create", "deployment", "$_IMAGE_NAME", "--image=$_REGISTRY_NAME/$PROJECT_ID/$_REPO_NAME/$_IMAGE_NAME:$_TAG_NAME"]
 
+  #- name: alpine/helm
+  #  entrypoint: helm
+  #  args: ["upgrade", "--install", "$_IMAGE_NAME", "$_CHART_DIR", "-n", "$_NAMESPACE_NAME", "--set", "image.repository=$_REGISTRY_NAME/$PROJECT_ID/$_REPO_NAME/$_IMAGE_NAME", "--set", "image.tag=$_TAG_NAME"]
+  
   - name: alpine/helm
-    entrypoint: helm
-    args: ["upgrade", "--install", "$_IMAGE_NAME", "$_CHART_DIR", "-n", "$_NAMESPACE_NAME", "--set", "image.repository=$_REGISTRY_NAME/$PROJECT_ID/$_REPO_NAME/$_IMAGE_NAME", "--set", "image.tag=$_TAG_NAME"]
+    entrypoint: sh
+    args: ["-c", "helm template $_IMAGE_NAME $_CHART_DIR -n $_NAMESPACE_NAME --set image.repository=$_REGISTRY_NAME/$PROJECT_ID/$_REPO_NAME/$_IMAGE_NAME --set image.tag=$_TAG_NAME > $_IMAGE_NAME.yml"]
+  
+  - name: gcr.io/cloud-builders/gcloud
+    entrypoint: kubectl
+    args: ["apply", "-f", "$_IMAGE_NAME.yml"]
 
 #images: ["$_REGISTRY_NAME/$PROJECT_ID/$_REPO_NAME/$_IMAGE_NAME:$_TAG_NAME"]
 
